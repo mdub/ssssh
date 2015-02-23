@@ -1,0 +1,62 @@
+#! /usr/bin/env ruby
+
+require "aws-sdk"
+require "base64"
+require "clamp"
+require "logger"
+
+Clamp do
+
+  option ["--region"], "REGION", "AWS region\n",
+         :environment_variable => "AWS_REGION",
+         :default => "ap-southeast-2"
+  option "--access-key", "KEY", "AWS access key\n",
+         :environment_variable => "AWS_ACCESS_KEY_ID",
+         :attribute_name => :access_key_id
+  option "--secret-key", "KEY", "AWS secret key\n",
+         :environment_variable => "AWS_SECRET_ACCESS_KEY",
+         :attribute_name => :secret_access_key
+  option "--session-token", "KEY", "AWS security token\n",
+         :environment_variable => "AWS_SECURITY_TOKEN",
+         :attribute_name => :session_token
+
+  option "--debug", :flag, "enable debugging"
+
+  subcommand "encrypt", "Encrypt STDIN" do
+
+    parameter "KEY_ID", "KMS key-id"
+    parameter "[DATA]", "plaintext data"
+
+    def execute
+      plaintext = data || $stdin.read
+      response = kms.encrypt(:key_id => key_id, :plaintext => plaintext)
+      response = response.to_a.first
+      puts response.key_id
+      puts Base64.encode64(response.ciphertext_blob)
+    end
+
+  end
+
+  protected
+
+  def logger
+    @logger ||= ::Logger.new($stdout).tap do |logger|
+      logger.level = (debug? ? ::Logger::DEBUG : ::Logger::INFO)
+    end
+  end
+
+  def aws_config
+    {
+      :access_key_id => access_key_id,
+      :secret_access_key => secret_access_key,
+      :session_token => session_token,
+      :region => region,
+      :logger => logger, :log_level => :debug
+    }.reject { |k,v| v.nil? }
+  end
+
+  def kms
+    @kms ||= Aws::KMS::Client.new(aws_config)
+  end
+
+end
