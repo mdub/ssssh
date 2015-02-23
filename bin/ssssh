@@ -30,9 +30,18 @@ Clamp do
     def execute
       plaintext = data || $stdin.read
       response = kms.encrypt(:key_id => key_id, :plaintext => plaintext)
-      response = response.to_a.first
-      puts response.key_id
       puts Base64.encode64(response.ciphertext_blob)
+    end
+
+  end
+
+  subcommand "decrypt", "Decrypt STDIN" do
+
+    def execute
+      encoded_ciphertext = $stdin.read
+      ciphertext_blob = Base64.decode64(encoded_ciphertext)
+      response = kms.decrypt(:ciphertext_blob => ciphertext_blob)
+      puts response[:plaintext]
     end
 
   end
