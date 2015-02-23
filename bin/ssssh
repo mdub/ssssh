@@ -49,7 +49,7 @@ Clamp do
   protected
 
   def logger
-    @logger ||= ::Logger.new($stdout).tap do |logger|
+    @logger ||= ::Logger.new($stderr).tap do |logger|
       logger.level = (debug? ? ::Logger::DEBUG : ::Logger::INFO)
     end
   end
