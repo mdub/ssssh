@@ -58,7 +58,7 @@ Clamp do
       :session_token => session_token,
       :region => region,
       :logger => logger, :log_level => :debug
-    }.reject { |k,v| v.nil? }
+    }.reject { |k,v| v.nil? || v == "" }
   end
 
   def kms
