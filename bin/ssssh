@@ -8,8 +8,7 @@ require "logger"
 Clamp do
 
   option ["--region"], "REGION", "AWS region\n",
-         :environment_variable => "AWS_REGION",
-         :default => "ap-southeast-2"
+         :environment_variable => "AWS_REGION"
   option "--access-key", "KEY", "AWS access key\n",
          :environment_variable => "AWS_ACCESS_KEY_ID",
          :attribute_name => :access_key_id
@@ -44,6 +43,10 @@ Clamp do
   end
 
   protected
+
+  def default_region
+    ENV["AWS_REGION"] || ENV["AWS_DEFAULT_REGION"]
+  end
 
   def logger
     @logger ||= ::Logger.new($stderr).tap do |logger|
