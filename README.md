@@ -1,31 +1,26 @@
 # Ssssh
 
-TODO: Write a gem description
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'ssssh'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install ssssh
+"ssssh" is a small tool that can be used to encrypt and decrypt secrets, using the AWS "Key Management Service" KMS.
 
 ## Usage
 
-TODO: Write usage instructions here
+Encrypt secrets like this:
 
-## Contributing
+    ssssh encrypt KEY-ID < secrets.txt > secrets.encrypted
 
-1. Fork it ( https://github.com/[my-github-username]/ssssh/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+Later, you can decrypt them:
+
+    ssssh decrypt KEY-ID < secrets.encrypted > secrets.txt
+
+This assumes that the necessary AWS_xxx environment variables are set, and that KEY-ID is the name or alias of an existing KMS key.
+
+## Limitations
+
+"ssssh" can only encrypt small amounts of data; up to 4 KB.
+
+## See also
+
+If you'd rather install a Python interpreter than a Ruby one, secrets may also be decrypted using the AWS CLI.
+
+    base64 -d < secrets.encrypted > secrets.bin
+    aws kms decrypt --ciphertext-blob fileb://`pwd`/secret.bin --output text --query Plaintext | base64 -d > secrets.txt
