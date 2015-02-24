@@ -29,8 +29,7 @@ Clamp do
 
     def execute
       plaintext = data || $stdin.read
-      response = kms.encrypt(:key_id => key_id, :plaintext => plaintext)
-      puts Base64.encode64(response.ciphertext_blob)
+      puts Base64.encode64(encrypt(plaintext, key_id))
     end
 
   end
@@ -39,9 +38,7 @@ Clamp do
 
     def execute
       encoded_ciphertext = $stdin.read
-      ciphertext_blob = Base64.decode64(encoded_ciphertext)
-      response = kms.decrypt(:ciphertext_blob => ciphertext_blob)
-      puts response[:plaintext]
+      puts decrypt(Base64.decode64(encoded_ciphertext))
     end
 
   end
@@ -66,6 +63,14 @@ Clamp do
 
   def kms
     @kms ||= Aws::KMS::Client.new(aws_config)
+  end
+
+  def encrypt(plaintext, key_id)
+    kms.encrypt(:key_id => key_id, :plaintext => plaintext).ciphertext_blob
+  end
+
+  def decrypt(ciphertext)
+    kms.decrypt(:ciphertext_blob => ciphertext).plaintext
   end
 
 end
