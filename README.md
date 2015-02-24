@@ -22,5 +22,5 @@ This assumes that the necessary AWS_xxx environment variables are set, and that 
 
 If you'd rather install a Python interpreter than a Ruby one, secrets may also be decrypted using the AWS CLI.
 
-    base64 -d < secrets.encrypted > secrets.bin
-    aws kms decrypt --ciphertext-blob fileb://`pwd`/secret.bin --output text --query Plaintext | base64 -d > secrets.txt
+    base64 -d < secrets.encrypted > /tmp/secrets.bin
+    aws kms decrypt --ciphertext-blob fileb:///tmp/secrets.bin --output text --query Plaintext | base64 -d > secrets.txt
