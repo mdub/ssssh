@@ -1,6 +1,6 @@
-# Ssssh
+# Ssssh!
 
-"ssssh" is a small tool that can be used to encrypt and decrypt secrets, using the AWS "Key Management Service" KMS.
+"ssssh" is a small tool that can be used to encrypt and decrypt secrets, using the AWS "Key Management Service" (KMS).
 
 ## Usage
 
@@ -10,7 +10,7 @@ Encrypt secrets like this:
 
 Later, you can decrypt them:
 
-    ssssh decrypt KEY-ID < secrets.encrypted > secrets.txt
+    ssssh decrypt < secrets.encrypted > secrets.txt
 
 This assumes that the necessary AWS_xxx environment variables are set, and that KEY-ID is the name or alias of an existing KMS key.
 
