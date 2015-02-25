@@ -4,6 +4,7 @@ require "aws-sdk-core"
 require "base64"
 require "clamp"
 require "logger"
+require "ssssh/version"
 
 Clamp do
 
@@ -20,6 +21,11 @@ Clamp do
          :attribute_name => :session_token
 
   option "--debug", :flag, "enable debugging"
+
+  option "--version", :flag, "display version" do
+    puts "ssssh-#{Ssssh::VERSION}"
+    exit 0
+  end
 
   subcommand "encrypt", "Encrypt STDIN" do
 
