@@ -12,7 +12,9 @@ Later, you can decrypt them:
 
     ssssh decrypt < secrets.encrypted > secrets.txt
 
-This assumes that the necessary AWS_xxx environment variables are set, and that KEY-ID is the name or alias of an existing KMS key.
+KEY-ID must be the name or alias of an existing KMS key.
+
+Naturally, suitable AWS credentials must be provided (via environment variables, command-line options, or EC2 instance profile).
 
 ## Limitations
 
