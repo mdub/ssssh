@@ -30,20 +30,32 @@ Clamp do
   subcommand "encrypt", "Encrypt STDIN" do
 
     parameter "KEY_ID", "KMS key-id"
-    parameter "[DATA]", "plaintext data"
+    parameter "[PLAINTEXT]", "plaintext", :default => "STDIN"
 
     def execute
-      plaintext = data || $stdin.read
       puts Base64.encode64(encrypt(plaintext, key_id))
+    end
+
+    private
+
+    def default_plaintext
+      $stdin.read
     end
 
   end
 
   subcommand "decrypt", "Decrypt STDIN" do
 
+    parameter "[CIPHERTEXT]", "encoded ciphertext", :default => "STDIN"
+
     def execute
-      encoded_ciphertext = $stdin.read
-      puts decrypt(Base64.decode64(encoded_ciphertext))
+      puts decrypt(Base64.decode64(ciphertext))
+    end
+
+    private
+
+    def default_ciphertext
+      $stdin.read
     end
 
   end
