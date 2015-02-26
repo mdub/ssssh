@@ -82,16 +82,22 @@ Clamp do
     }.reject { |k,v| v.nil? || v == "" }
   end
 
-  def kms
-    @kms ||= Aws::KMS::Client.new(aws_config)
+  def with_kms
+    yield Aws::KMS::Client.new(aws_config)
+  rescue Aws::KMS::Errors::ServiceError => e
+    signal_error(e.message, :status => 9)
   end
 
   def encrypt(plaintext, key_id)
-    kms.encrypt(:key_id => key_id, :plaintext => plaintext).ciphertext_blob
+    with_kms do |kms|
+      kms.encrypt(:key_id => key_id, :plaintext => plaintext).ciphertext_blob
+    end
   end
 
   def decrypt(ciphertext)
-    kms.decrypt(:ciphertext_blob => ciphertext).plaintext
+    with_kms do |kms|
+      kms.decrypt(:ciphertext_blob => ciphertext).plaintext
+    end
   end
 
 end
