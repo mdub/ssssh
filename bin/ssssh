@@ -4,12 +4,13 @@ require "aws-sdk-core"
 require "base64"
 require "clamp"
 require "logger"
+require "multi_json"
 require "ssssh/version"
 
 Clamp do
 
   option ["--region"], "REGION", "AWS region",
-         :environment_variable => "AWS_REGION"
+         :environment_variable => "AWS_REGION", :required => true
   option "--access-key", "KEY", "AWS access key",
          :environment_variable => "AWS_ACCESS_KEY_ID",
          :attribute_name => :access_key_id
@@ -63,7 +64,7 @@ Clamp do
   protected
 
   def default_region
-    ENV["AWS_REGION"] || ENV["AWS_DEFAULT_REGION"]
+    ENV["AWS_REGION"] || ENV["AWS_DEFAULT_REGION"] || ec2_instance_metadata["region"]
   end
 
   def logger
@@ -73,6 +74,7 @@ Clamp do
   end
 
   def aws_config
+    # signal_error "No --region specified" unless region
     {
       :access_key_id => access_key_id,
       :secret_access_key => secret_access_key,
@@ -80,6 +82,18 @@ Clamp do
       :region => region,
       :logger => logger, :log_level => :debug
     }.reject { |k,v| v.nil? || v == "" }
+  end
+
+  def ec2_instance_metadata
+    uri = URI("http://169.254.169.254/latest/dynamic/instance-identity/document")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.open_timeout = 1
+    document = http.start do
+      http.request_get(uri.path).body
+    end
+    MultiJson.load(document)
+  rescue Net::OpenTimeout
+    {}
   end
 
   def with_kms
