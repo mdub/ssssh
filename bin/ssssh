@@ -5,6 +5,7 @@ require "base64"
 require "clamp"
 require "logger"
 require "multi_json"
+require "net/http"
 require "ssssh/version"
 
 Clamp do
