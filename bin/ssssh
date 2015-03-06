@@ -31,11 +31,15 @@ Clamp do
 
   subcommand "encrypt", "Encrypt STDIN" do
 
+    option "--[no-]wrap", :flag, "wrap encrypted data", :default => true
+
     parameter "KEY_ID", "KMS key-id"
     parameter "[PLAINTEXT]", "plaintext", :default => "STDIN"
 
     def execute
-      puts Base64.encode64(encrypt(plaintext, key_id))
+      result = Base64.encode64(encrypt(plaintext, key_id))
+      result.gsub!("\n", "") unless wrap?
+      puts result
     end
 
     private
