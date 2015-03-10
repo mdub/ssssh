@@ -29,7 +29,7 @@ Clamp do
     exit 0
   end
 
-  subcommand "encrypt", "Encrypt STDIN" do
+  subcommand "encrypt", "Encrypt" do
 
     option "--[no-]wrap", :flag, "wrap encrypted data", :default => true
 
@@ -50,7 +50,7 @@ Clamp do
 
   end
 
-  subcommand "decrypt", "Decrypt STDIN" do
+  subcommand "decrypt", "Decrypt" do
 
     parameter "[CIPHERTEXT]", "encoded ciphertext", :default => "STDIN"
 
