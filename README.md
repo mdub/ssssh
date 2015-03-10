@@ -12,7 +12,7 @@ Later, you can decrypt them:
 
     ssssh decrypt < secrets.encrypted > secrets.txt
 
-KEY-ID must be the name or alias of an existing KMS key.
+KEY-ID can be the id or ARN of a KMS master key, or alias prefixed by "alias/".  See document on [Encrypt](http://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html) for more details.
 
 Naturally, suitable AWS credentials must be provided (via environment variables, command-line options, or EC2 instance profile).
 

@@ -33,7 +33,7 @@ Clamp do
 
     option "--[no-]wrap", :flag, "wrap encrypted data", :default => true
 
-    parameter "KEY_ID", "KMS key-id"
+    parameter "KEY_ID", "KMS key or alias"
     parameter "[PLAINTEXT]", "plaintext", :default => "STDIN"
 
     def execute
