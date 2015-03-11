@@ -55,6 +55,7 @@ Clamp do
     parameter "[CIPHERTEXT]", "encoded ciphertext", :default => "STDIN"
 
     def execute
+      return if ciphertext.empty?
       puts decrypt(Base64.decode64(ciphertext))
     end
 
