@@ -10,6 +10,10 @@ require "ssssh/version"
 
 Clamp do
 
+  option ["-C", "--context"], "KEY=VALUE",
+         "add to encryption context\n  (may be specified multiple times)",
+         :multivalued => true
+
   option ["--region"], "REGION", "AWS region",
          :environment_variable => "AWS_REGION", :required => true
   option "--access-key", "KEY", "AWS access key",
@@ -107,15 +111,36 @@ Clamp do
     signal_error(e.message, :status => 9)
   end
 
+  def encryption_context
+    @encryption_context ||= {}
+  end
+
+  def append_to_context_list(context_string)
+    key, value = context_string.split('=')
+    if value.nil?
+      raise ArgumentError, "KEY=VALUE expected"
+    end
+    encryption_context[key] = value
+  end
+
   def encrypt(plaintext, key_id)
     with_kms do |kms|
-      kms.encrypt(:key_id => key_id, :plaintext => plaintext).ciphertext_blob
+      encryption_params = {
+        :key_id => key_id,
+        :plaintext => plaintext,
+        :encryption_context => encryption_context
+      }
+      kms.encrypt(encryption_params).ciphertext_blob
     end
   end
 
   def decrypt(ciphertext)
     with_kms do |kms|
-      kms.decrypt(:ciphertext_blob => ciphertext).plaintext
+      decryption_params = {
+        :ciphertext_blob => ciphertext,
+        :encryption_context => encryption_context
+      }
+      kms.decrypt(decryption_params).plaintext
     end
   end
 
