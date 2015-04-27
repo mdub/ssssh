@@ -26,3 +26,9 @@ If you'd rather install a Python interpreter than a Ruby one, secrets may also b
 
     base64 -d < secrets.encrypted > /tmp/secrets.bin
     aws kms decrypt --ciphertext-blob fileb:///tmp/secrets.bin --output text --query Plaintext | base64 -d > secrets.txt
+
+## Changes
+
+### 1.2.0 (2015-04-27)
+
+* Add support for encryption contexts (`--context` option).
