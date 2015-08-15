@@ -107,6 +107,8 @@ Clamp do
 
   def with_kms
     yield Aws::KMS::Client.new(aws_config)
+  rescue Aws::KMS::Errors::InvalidCiphertextException
+    signal_error("Invalid Ciphertext", :status => 1)
   rescue Aws::KMS::Errors::ServiceError => e
     signal_error(e.message, :status => 9)
   end
