@@ -112,7 +112,7 @@ Clamp do
   end
 
   def encryption_context
-    @encryption_context ||= {}
+    context[:encryption_context] ||= {}
   end
 
   def append_to_context_list(context_string)
