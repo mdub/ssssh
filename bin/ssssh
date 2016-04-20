@@ -77,6 +77,18 @@ Clamp do
     ENV["AWS_REGION"] || ENV["AWS_DEFAULT_REGION"] || ec2_instance_metadata["region"]
   end
 
+  def default_access_key_id
+    ENV["AWS_ACCESS_KEY_ID"] || ec2_instance_credentials["AccessKeyId"]
+  end
+
+  def default_secret_access_key
+    ENV["AWS_SECRET_ACCESS_KEY"] || ec2_instance_credentials["SecretAccessKey"]
+  end
+
+  def default_session_token
+    ENV["AWS_SECURITY_TOKEN"] || ec2_instance_credentials["Token"]
+  end
+
   def logger
     @logger ||= ::Logger.new($stderr).tap do |logger|
       logger.level = (debug? ? ::Logger::DEBUG : ::Logger::INFO)
@@ -94,15 +106,27 @@ Clamp do
   end
 
   def ec2_instance_metadata
-    uri = URI("http://169.254.169.254/latest/dynamic/instance-identity/document")
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.open_timeout = 1
-    document = http.start do
-      http.request_get(uri.path).body
-    end
+    document = send_request("http://169.254.169.254/latest/dynamic/instance-identity/document")
     MultiJson.load(document)
   rescue Net::OpenTimeout
     {}
+  end
+
+  def ec2_instance_credentials
+    role_name = send_request("http://169.254.169.254/latest/meta-data/iam/security-credentials/")
+    credentials = send_request("http://169.254.169.254/latest/meta-data/iam/security-credentials/#{role_name}")
+    MultiJson.load(credentials)
+  rescue Net::OpenTimeout
+    {}
+  end
+
+  def send_request(url)
+    uri = URI(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.open_timeout = 1
+    http.start do
+      http.request_get(uri.path).body
+    end
   end
 
   def with_kms
