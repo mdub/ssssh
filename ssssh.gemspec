@@ -1,15 +1,14 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'ssssh/version'
+require "ssssh/version"
 
 Gem::Specification.new do |spec|
 
   spec.name          = "ssssh"
   spec.version       = Ssssh::VERSION
-  spec.summary       = %q{It's a secret!}
-  spec.description   = %q{"ssssh" is a small tool that can be used to encrypt and decrypt secrets, using the AWS "Key Management Service" (KMS).
-}
+  spec.summary       = "It's a secret!"
+  spec.description   = '"ssssh" is a small tool that can be used to encrypt and decrypt secrets, using the AWS "Key Management Service" (KMS).
+'
   spec.license       = "MIT"
 
   spec.authors       = ["Mike Williams"]

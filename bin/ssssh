@@ -42,7 +42,7 @@ Clamp do
 
     def execute
       result = Base64.encode64(encrypt(plaintext, key_id))
-      result.gsub!("\n", "") unless wrap?
+      result.delete!("\n") unless wrap?
       puts result
     end
 
@@ -90,7 +90,7 @@ Clamp do
       :session_token => session_token,
       :region => region,
       :logger => logger, :log_level => :debug
-    }.reject { |k,v| v.nil? || v == "" }
+    }.reject { |_k, v| v.nil? || v == "" }
   end
 
   def ec2_instance_metadata
@@ -118,10 +118,8 @@ Clamp do
   end
 
   def append_to_context_list(context_string)
-    key, value = context_string.split('=')
-    if value.nil?
-      raise ArgumentError, "KEY=VALUE expected"
-    end
+    key, value = context_string.split("=")
+    raise ArgumentError, "KEY=VALUE expected" if value.nil?
     encryption_context[key] = value
   end
 
