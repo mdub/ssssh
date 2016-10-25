@@ -12,7 +12,8 @@ Clamp do
 
   option ["-C", "--context"], "KEY=VALUE",
          "add to encryption context\n  (may be specified multiple times)",
-         :multivalued => true
+         :multivalued => true,
+         :environment_variable => "KMS_ENCRYPTION_CONTEXT"
 
   option ["--region"], "REGION", "AWS region",
          :environment_variable => "AWS_REGION", :required => true
