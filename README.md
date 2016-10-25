@@ -61,7 +61,7 @@ If you'd rather not install an interpreter at all, there's a Go-lang port of "ss
 
 ## Changes
 
-### PENDING
+### 1.3.0 (2016-10-26)
 
 * Add `ssssh exec` subcommand.
 * Add support for `$KMS_ENCRYPTION_CONTEXT`.
