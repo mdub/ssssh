@@ -106,8 +106,8 @@ Clamp do
     super(*args)
   rescue Aws::Errors::MissingCredentialsError
     signal_error "no credentials provided"
-  rescue Aws::KMS::Errors::InvalidCiphertextException
-    signal_error(e.message, :status => 1)
+  rescue Aws::KMS::Errors::InvalidCiphertextException => e
+    signal_error("invalid ciphertext", :status => 1)
   rescue Aws::KMS::Errors::ServiceError => e
     signal_error(e.message, :status => 9)
   end
