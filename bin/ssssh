@@ -41,7 +41,7 @@ Clamp do
     parameter "[PLAINTEXT]", "plaintext", :default => "STDIN"
 
     def execute
-      result = Base64.encode64(encrypt(plaintext, key_id))
+      result = encrypt(plaintext, key_id)
       result.delete!("\n") unless wrap?
       puts result
     end
@@ -60,7 +60,7 @@ Clamp do
 
     def execute
       return if ciphertext.empty?
-      puts decrypt(Base64.decode64(ciphertext))
+      puts decrypt(ciphertext)
     end
 
     private
@@ -69,6 +69,46 @@ Clamp do
       $stdin.read
     end
 
+  end
+
+  subcommand "exec", "Execute a command" do
+
+    option "--prefix", "PREFIX", "environment variable prefix",
+           :default => "KMS_ENCRYPTED_"
+
+    parameter "COMMAND ...", "command to execute", :attribute_name => :command
+
+    def execute
+      exec(decrypted_env, *command)
+    end
+
+    private
+
+    def decrypted_env
+      {}.tap do |result|
+        ENV.each do |name, ciphertext|
+          next unless name.start_with?(prefix)
+          begin
+            plaintext_name = name[prefix.length .. -1]
+            plaintext = decrypt(ciphertext)
+            result[plaintext_name] = plaintext
+          rescue Aws::KMS::Errors::InvalidCiphertextException => e
+            signal_error("cannot decrypt $#{name}; invalid ciphertext", :status => 1)
+          end
+        end
+      end
+    end
+
+  end
+
+  def run(*args)
+    super(*args)
+  rescue Aws::Errors::MissingCredentialsError
+    signal_error "no credentials provided"
+  rescue Aws::KMS::Errors::InvalidCiphertextException
+    signal_error(e.message, :status => 1)
+  rescue Aws::KMS::Errors::ServiceError => e
+    signal_error(e.message, :status => 9)
   end
 
   protected
@@ -107,10 +147,6 @@ Clamp do
 
   def with_kms
     yield Aws::KMS::Client.new(aws_config)
-  rescue Aws::KMS::Errors::InvalidCiphertextException
-    signal_error("Invalid Ciphertext", :status => 1)
-  rescue Aws::KMS::Errors::ServiceError => e
-    signal_error(e.message, :status => 9)
   end
 
   def encryption_context
@@ -130,14 +166,14 @@ Clamp do
         :plaintext => plaintext,
         :encryption_context => encryption_context
       }
-      kms.encrypt(encryption_params).ciphertext_blob
+      Base64.encode64(kms.encrypt(encryption_params).ciphertext_blob)
     end
   end
 
   def decrypt(ciphertext)
     with_kms do |kms|
       decryption_params = {
-        :ciphertext_blob => ciphertext,
+        :ciphertext_blob => Base64.decode64(ciphertext),
         :encryption_context => encryption_context
       }
       kms.decrypt(decryption_params).plaintext
