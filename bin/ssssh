@@ -8,6 +8,9 @@ require "multi_json"
 require "net/http"
 require "ssssh/version"
 
+# AWS_SECURITY_TOKEN is a deprecated alias for AWS_SESSION_TOKEN
+ENV["AWS_SESSION_TOKEN"] ||= ENV["AWS_SECURITY_TOKEN"]
+
 Clamp do
 
   option ["-C", "--context"], "KEY=VALUE",
@@ -24,7 +27,7 @@ Clamp do
          :environment_variable => "AWS_SECRET_ACCESS_KEY",
          :attribute_name => :secret_access_key
   option "--session-token", "KEY", "AWS security token",
-         :environment_variable => "AWS_SECURITY_TOKEN",
+         :environment_variable => "AWS_SESSION_TOKEN",
          :attribute_name => :session_token
 
   option "--debug", :flag, "enable debugging"
