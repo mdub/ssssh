@@ -155,9 +155,11 @@ Clamp do
   end
 
   def append_to_context_list(context_string)
-    key, value = context_string.split("=")
-    raise ArgumentError, "KEY=VALUE expected" if value.nil?
-    encryption_context[key] = value
+    context_string.split(",").each do |pair|
+      key, value = pair.split("=", 2)
+      raise ArgumentError, "KEY=VALUE expected" if value.nil?
+      encryption_context[key] = value
+    end
   end
 
   def encrypt(plaintext, key_id)
